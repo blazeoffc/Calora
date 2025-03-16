@@ -39,22 +39,24 @@ document.addEventListener("DOMContentLoaded", async function () {
   let firebaseConfig;
 
   try {
-   const response = await fetch("/firebase-config.json");
+    console.log("Fetching Firebase config...");
+
+    const response = await fetch("/firebase-config.json");
     if (!response.ok) throw new Error("Failed to load Firebase config");
-    firebaseConfig = await response.json();
+
+    const firebaseConfig = await response.json();
     console.log("✅ Firebase config loaded successfully.");
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase initialized successfully.");
+    } else {
+      console.log("⚠️ Firebase already initialized. Skipping re-initialization.");
+    }
+
   } catch (error) {
     console.error("❌ Firebase initialization error:", error);
-    return;
   }
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-    console.log("✅ Firebase initialized successfully.");
-  } else {
-    console.log("⚠️ Firebase already initialized.");
-  }
-
 
   const auth = firebase.auth();
   const db = firebase.firestore();
