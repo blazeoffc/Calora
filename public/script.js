@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const overlay = document.getElementById("overlay");
   const outputDiv = document.getElementById("output");
 
+  
   if (registerLink && loginLink) {
     registerLink.addEventListener("click", () => wrapper.classList.add("active"));
     loginLink.addEventListener("click", () => wrapper.classList.remove("active"));
@@ -35,20 +36,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  try {
-    const response = await fetch("/firebase-config.json");
-    if (!response.ok) throw new Error("Failed to load Firebase config");
-    const firebaseConfig = await response.json();
+  let firebaseConfig;
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-      console.log("✅ Firebase initialized successfully.");
-    } else {
-      console.log("⚠️ Firebase already initialized.");
-    }
+  try {
+   const response = await fetch("/firebase-config.json");
+    if (!response.ok) throw new Error("Failed to load Firebase config");
+    firebaseConfig = await response.json();
+    console.log("✅ Firebase config loaded successfully.");
   } catch (error) {
     console.error("❌ Firebase initialization error:", error);
+    return;
   }
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+    console.log("✅ Firebase initialized successfully.");
+  } else {
+    console.log("⚠️ Firebase already initialized.");
+  }
+
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
   function checkAuthStatus() {
     const userId = localStorage.getItem("userId");
@@ -75,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       checkAuthStatus();
       window.location.href = "index.html";
     });
+    
   }
 
   const calorieTracker = document.getElementById("calorie-tracker");
